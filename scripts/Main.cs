@@ -6,6 +6,8 @@ public partial class Main : Node
 {
     [Export] private TileMap _TileMap;
     private CellularMatrix _CellularMatrix;
+    private int selectedType = 0;
+    private const int MAX_TYPE = 1;
 
     [Export] Dictionary<ElementType, Vector2I> cellDictionary = new Dictionary<ElementType, Vector2I>();
 
@@ -23,22 +25,70 @@ public partial class Main : Node
         }
     }
 
+    private void PaintSize(Vector2I coordinates, int size, ElementType type)
+    {
+        for(int x = coordinates.X;x < coordinates.X+size;x++)
+        {
+            for(int y = coordinates.Y; y < coordinates.Y+size; y++)
+            {
+                PaintSelected(new Vector2I(x,y), type);
+            }
+        }
+    }
+
+    private void PaintSelected(Vector2I coordinates, ElementType type) {
+        if (_CellularMatrix.IsValidCoordinates(coordinates))
+        {
+            _CellularMatrix.SetCell(type, coordinates);
+        }
+    }
+
     private void PaintCells()
     {
-        if (Input.IsActionPressed("click"))
+        if (Input.IsActionPressed("left_click"))
         {
             Vector2 mousePos = GetViewport().GetMousePosition();
             Vector2I coordinates = new Vector2I((int)(mousePos.X), (int)(mousePos.Y));
-            if (_CellularMatrix.IsValidCoordinates(coordinates))
+            //GD.Print(coordinates / 4);
+            ElementType type = ElementType.NONE;
+            if (selectedType == 0) { type = ElementType.SAND; }
+            else if (selectedType == 1) { type = ElementType.WATER; }
+            PaintSize(coordinates/4, 4, type);
+        } else if (Input.IsActionPressed("right_click"))
+        {
+            Vector2 mousePos = GetViewport().GetMousePosition();
+            Vector2I coordinates = new Vector2I((int) (mousePos.X), (int) (mousePos.Y));
+            //GD.Print(coordinates / 4);
+            if (_CellularMatrix.IsValidCoordinates(coordinates / 4))
             {
-                _CellularMatrix.SetCell(ElementType.SAND, coordinates/4);
+                PaintSize(coordinates / 4, 4, ElementType.STONE);
             }
         }
 
     }
 
+    private void cycleSelection()
+    {
+        if(selectedType < MAX_TYPE)
+        {
+            selectedType++;
+        } else
+        {
+            selectedType = 0;
+        }
+    }
+
+    private void ProcessInput()
+    {
+        if (Input.IsActionJustPressed("key_one"))
+        {
+            cycleSelection();
+        }
+    }
+
     public void _on_timer_timeout()
     {
+        ProcessInput();
         PaintCells();
         StepAllAndDraw();
     }

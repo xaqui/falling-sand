@@ -25,6 +25,10 @@ public abstract class Element
 
     public void swapPositions(CellularMatrix matrix, Element toSwap, Vector2I coordinatesToSwap)
     {
+        if (!matrix.IsValidCoordinates(coordinatesToSwap))
+        {
+            return;
+        }
         if (_coordinates.X == toSwap._coordinates.X && _coordinates.Y == toSwap._coordinates.Y)
         {
             return;

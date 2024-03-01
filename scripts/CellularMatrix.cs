@@ -48,20 +48,26 @@ public class CellularMatrix
         } else if (type == ElementType.STONE)
         {
             return new Stone(coordinates);
+        } else if (type == ElementType.WATER)
+        {
+            return new Water(coordinates);
         }
         return new EmptyCell(coordinates);
     }
 
     public void SetCell(ElementType type, Vector2I coordinates)
     {
-        Matrix[coordinates.X,coordinates.Y] = CreateElementBasedOnType(type, coordinates);
+        if (IsValidCoordinates(coordinates))
+        {
+            Matrix[coordinates.X,coordinates.Y] = CreateElementBasedOnType(type, coordinates);
+        }
     }
 
     public void StepAll()
     {
-        for (int x = _size.X-1; x > 0; x--)
+        for (int x = _size.X-1; x >= 0; x--)
         {
-            for (int y = _size.Y-1; y > 0; y--)
+            for (int y = _size.Y-1; y >= 0; y--)
             {
                 Matrix[x, y].step(this);
             }
@@ -70,7 +76,7 @@ public class CellularMatrix
 
     public bool IsValidCoordinates(Vector2I coordinates)
     {
-        if(coordinates > _size || coordinates < Vector2I.Zero)
+        if(coordinates.X >= _size.X || coordinates.Y >= _size.Y || (coordinates.X < 0) || (coordinates.Y < 0))
         {
             return false;
         }

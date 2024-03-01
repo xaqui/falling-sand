@@ -2,5 +2,6 @@ public enum ElementType
 {
     NONE = 0,
     SAND = 1,
-    STONE = 2
+    STONE = 2,
+    WATER = 3
 }
